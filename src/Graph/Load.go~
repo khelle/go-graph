@@ -1,0 +1,49 @@
+package Graph
+
+import (
+	"os"
+	"encoding/csv"
+	"io"
+	"fmt"
+	"strings"
+	"strconv"
+)
+
+/**
+ *
+ */
+func LoadGraph(path string, graph Graph) {
+	file, err := os.Open(path)
+	if err != nil {
+		fmt.Println("Error: ", err)
+		return
+	}
+	defer file.Close()
+
+	reader := csv.NewReader(file)
+	reader.Comma = ';'
+
+	var from int
+	var to int
+	var weight float64
+
+	for {
+		record, err := reader.Read()
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			fmt.Println("Error: ", err)
+			return
+		}
+
+
+
+		from, _ = strconv.Atoi(strings.Trim(record[0], " "))
+		to, _ = strconv.Atoi(strings.Trim(record[1], " "))
+		weight, _ = strconv.ParseFloat(strings.Trim(record[2], " "), 64)
+
+		graph.AddVertex(from, &GraphVertex{from})
+		graph.AddVertex(to, &GraphVertex{to})
+		graph.AddEdge(from, to, &GraphEdge{weight, from, to})
+	}
+}
